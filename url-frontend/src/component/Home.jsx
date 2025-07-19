@@ -65,54 +65,58 @@ function Home() {
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white px-5 h-12 rounded-r-md hover:bg-blue-600 transition"
+            className="bg-black text-white px-5 h-12 rounded-r-md hover:bg-blue-600 transition"
           >
             Shorten URL
           </button>
         </form>
 
         <div className="text-center text-gray-700 space-y-2">
-            {url.optimistic && <div>{url.optimistic}</div>}
-            <div className="flex justify-center">
-              <div>
-            {url.isLoaded && url.origin?.shorturl && (
-              <div className="flex justify-center">
-                <div className="flex-col">
-                  <strong>Short URL:</strong>{" "}
+          {url.optimistic && <div>{url.optimistic}</div>}
+          <div className="flex justify-center">
+            <div>
+              {url.isLoaded && url.origin?.shorturl && (
+                <div className="flex justify-center">
+                  <div className="flex max-[500px]:flex-col items-start">
+                    <div>
+                      <strong>Short URL :</strong>
+                    </div>
+                    <div className="flex">
+                      <a
+                        href={url.origin.shorturl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black hover:text-blue-600 underline break-all"
+                      >
+                        {url.origin.shorturl}
+                      </a>
+                      <button onClick={() => navigator.clipboard.writeText(url.origin.shorturl)} className="ml-4 bg-white text-black rounded-lg items-baseline">
+                        <Copy className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {url.isLoaded && url.origin?.originalurl && (
+                <div>
+                  <strong>Original URL:</strong>{" "}
                   <a
-                    href={url.origin.shorturl}
+                    href={url.origin.originalurl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline break-all"
+                    className="text-black hover:text-blue-600 break-all underline"
                   >
-                    {url.origin.shorturl}
+                    {url.origin.originalurl}
                   </a>
-                  <button onClick={() => navigator.clipboard.writeText(url.origin.shorturl)} className="ml-4 bg-white text-black rounded-lg items-baseline">
-                    <Copy className="w-5 h-5" />
-                  </button>
                 </div>
-              </div>
-            )}
-            {url.isLoaded && url.origin?.originalurl && (
-              <div>
-                <strong>Original URL:</strong>{" "}
-                <a
-                  href={url.origin.originalurl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-800 break-all underline"
-                >
-                  {url.origin.originalurl}
-                </a>
-              </div>
-            )}
-              </div>
-            {url.isLoaded && url.origin?.originalurl &&(
-              <div>
-                <QRGenerator url={url.origin.shorturl}/>
-              </div>
-            )}
+              )}
             </div>
+            {url.isLoaded && url.origin?.originalurl && (
+              <div className="ml-4">
+                <QRGenerator url={url.origin.shorturl} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

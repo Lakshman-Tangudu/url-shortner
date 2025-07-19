@@ -4,11 +4,11 @@ const { customAlphabet } = require('nanoid');
 const { clerkMiddleware, getAuth } = require('@clerk/express'); // ✅ Correct
 require('dotenv').config();
 const {connectToDb , getDb} =require('./db_connect');
-const axios = require('axios');
-const puppeteer = require('puppeteer');
+const axios = require("axios");
 const app = express();
+const API_KEY = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
 
-app.use(clerkMiddleware()); // ✅ Clerk must be registered FIRST!
+app.use(clerkMiddleware()); 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -46,43 +46,78 @@ function checkprotocol(reqUrl){
     }
 }
 
-async function checkurl(url) {
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+// async function urlcheck(userUrl) {
+//     // ✅ Step 1: Format Validation
+//     let parsedUrl;
 
-    const page = await browser.newPage();
+//     try {
+//         parsedUrl = new URL(userUrl);
+//     } catch (err) {
+//         return false;
+//     }
 
-    try {
-        const response = await page.goto(url, {
-            waitUntil: 'domcontentloaded',
-            timeout: 10000
-        });
+//     const hostname = parsedUrl.hostname;
+//     const protocol = parsedUrl.protocol;
 
-        const status = response.status();
-        console.log(`Status: ${status}`);
-        await browser.close();
-        return status >= 200 && status < 400;
+//     if (!['http:', 'https:'].includes(protocol)) {
+//         return false;
+//     }
 
-    } catch (err) {
-        console.error("Browser error:", err.message);
-        await browser.close();
-        return false;
-    }
-}
+//     if (hostname.includes(',') || hostname.includes(' ')) {
+//         return false;
+//     }
 
+//     if (!hostname.includes('.')) {
+//         return false;
+//     }
 
-// async function checkLink(url) {
-//   try {
-//     const response = await axios.head(url);
-//     console.log(`${url} is working. Status: ${response.status}`);
+//     // ✅ Step 2: Google Safe Browsing Check
+//     const apiUrl = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${API_KEY}`;
+
+//     const body = {
+//         client: {
+//             clientId: 'url-shortener-checker',
+//             clientVersion: '1.0',
+//         },
+//         threatInfo: {
+//             threatTypes: [
+//                 'MALWARE',
+//                 'SOCIAL_ENGINEERING',
+//                 'UNWANTED_SOFTWARE',
+//                 'POTENTIALLY_HARMFUL_APPLICATION',
+//             ],
+//             platformTypes: ['ANY_PLATFORM'],
+//             threatEntryTypes: ['URL'],
+//             threatEntries: [{ url: userUrl }],
+//         },
+//     };
+
+//     try {
+//         const response = await axios.post(apiUrl, body);
+//         const isUnsafe = response.data && response.data.matches;
+
+//         if (isUnsafe) {
+//             return false;
+//         }
+//     } catch (error) {
+//         console.error('Safe Browsing API error:', error.message);
+//         return false;
+//     }
+
+//     // ✅ Passed all checks
 //     return true;
-//   } catch (error) {
-//     console.error(`${url} failed. ${error.response?.status || error.message}`);
-//     return false;
-//   }
 // }
+
+async function urlcheck(url) {
+  try {
+    const response = await axios.head(url);
+    console.log(`${url} is working. Status: ${response.status}`);
+    return true;
+  } catch (error) {
+    console.error(`${url} failed. ${error.response?.status || error.message}`);
+    return false;
+  }
+}
 
 
 app.post('/api/shorten',short, async (req, res) => {
@@ -92,7 +127,7 @@ app.post('/api/shorten',short, async (req, res) => {
     if(!req.body.originalUrl) return res.status(400).json({ message: 'Please enter a valid url' });
     if(!checkprotocol(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
     //if(!checkLink(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
-    checkurl(req.body.originalUrl).then(async (r)=>{
+    urlcheck(req.body.originalUrl).then(async (r)=>{
         console.log(r);
         if(!r)  return res.status(400).json({ message: 'Please enter a valid url' });
     console.log('short',req.shortUrl);
@@ -109,7 +144,6 @@ app.post('/api/shorten',short, async (req, res) => {
         });
     }
 
-             // Save to database
     try{
             await insert(short, original, userId);
                 res.status(302).json({
@@ -132,9 +166,6 @@ async function insert(short, original ,user_id) {
         const query = 'INSERT INTO userdata (short_url, long_url , user_id) VALUES (?, ? ,?)';
         
         const [result] = await db.execute(query, [short, original,user_id]);
-        
-        //urlmap[short]=original;
-        
         
     }catch(err){
         
