@@ -5,7 +5,7 @@ const { clerkMiddleware, getAuth } = require('@clerk/express'); // ✅ Correct
 require('dotenv').config();
 const {connectToDb , getDb} =require('./db_connect');
 const axios = require('axios');
-
+const puppeteer = require('puppeteer');
 const app = express();
 
 app.use(clerkMiddleware()); // ✅ Clerk must be registered FIRST!
@@ -46,39 +46,43 @@ function checkprotocol(reqUrl){
     }
 }
 
-// async function checkurl(reqUrl) {
-//     try {
-//         console.log('Checking URL...');
+async function checkurl(url) {
+    const browser = await puppeteer.launch({
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
-//         const controller = new AbortController();
-//         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const page = await browser.newPage();
 
-//         const response = await fetch(reqUrl, {
-//             method: 'HEAD',
-//             signal: controller.signal
-//         });
+    try {
+        const response = await page.goto(url, {
+            waitUntil: 'domcontentloaded',
+            timeout: 10000
+        });
 
-//         clearTimeout(timeoutId);
+        const status = response.status();
+        console.log(`Status: ${status}`);
+        await browser.close();
+        return status >= 200 && status < 400;
 
-//         console.log('Checked URL');
-//         return response.ok;
-        
-//     } catch (err) {
-//         console.error('Error checking URL:', err.message || err);
-//         return false;
-//     }
-// }
-
-async function checkLink(url) {
-  try {
-    const response = await axios.head(url);
-    console.log(`${url} is working. Status: ${response.status}`);
-    return true;
-  } catch (error) {
-    console.error(`${url} failed. ${error.response?.status || error.message}`);
-    return false;
-  }
+    } catch (err) {
+        console.error("Browser error:", err.message);
+        await browser.close();
+        return false;
+    }
 }
+
+
+// async function checkLink(url) {
+//   try {
+//     const response = await axios.head(url);
+//     console.log(`${url} is working. Status: ${response.status}`);
+//     return true;
+//   } catch (error) {
+//     console.error(`${url} failed. ${error.response?.status || error.message}`);
+//     return false;
+//   }
+// }
 
 
 app.post('/api/shorten',short, async (req, res) => {
@@ -88,7 +92,8 @@ app.post('/api/shorten',short, async (req, res) => {
     if(!req.body.originalUrl) return res.status(400).json({ message: 'Please enter a valid url' });
     if(!checkprotocol(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
     //if(!checkLink(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
-    checkLink(req.body.originalUrl).then(async (r)=>{
+    checkurl(req.body.originalUrl).then(async (r)=>{
+        console.log(r);
         if(!r)  return res.status(400).json({ message: 'Please enter a valid url' });
     console.log('short',req.shortUrl);
     const original = req.body.originalUrl;
