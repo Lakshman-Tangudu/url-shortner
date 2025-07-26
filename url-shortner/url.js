@@ -4,9 +4,7 @@ const { customAlphabet } = require('nanoid');
 const { clerkMiddleware, getAuth } = require('@clerk/express'); // ✅ Correct
 require('dotenv').config();
 const {connectToDb , getDb} =require('./db_connect');
-const axios = require("axios");
 const app = express();
-const API_KEY = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
 
 app.use(clerkMiddleware()); 
 app.use(cors());
@@ -46,96 +44,27 @@ function checkprotocol(reqUrl){
     }
 }
 
-// async function urlcheck(userUrl) {
-//     // ✅ Step 1: Format Validation
-//     let parsedUrl;
-
-//     try {
-//         parsedUrl = new URL(userUrl);
-//     } catch (err) {
-//         return false;
-//     }
-
-//     const hostname = parsedUrl.hostname;
-//     const protocol = parsedUrl.protocol;
-
-//     if (!['http:', 'https:'].includes(protocol)) {
-//         return false;
-//     }
-
-//     if (hostname.includes(',') || hostname.includes(' ')) {
-//         return false;
-//     }
-
-//     if (!hostname.includes('.')) {
-//         return false;
-//     }
-
-//     // ✅ Step 2: Google Safe Browsing Check
-//     const apiUrl = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${API_KEY}`;
-
-//     const body = {
-//         client: {
-//             clientId: 'url-shortener-checker',
-//             clientVersion: '1.0',
-//         },
-//         threatInfo: {
-//             threatTypes: [
-//                 'MALWARE',
-//                 'SOCIAL_ENGINEERING',
-//                 'UNWANTED_SOFTWARE',
-//                 'POTENTIALLY_HARMFUL_APPLICATION',
-//             ],
-//             platformTypes: ['ANY_PLATFORM'],
-//             threatEntryTypes: ['URL'],
-//             threatEntries: [{ url: userUrl }],
-//         },
-//     };
-
-//     try {
-//         const response = await axios.post(apiUrl, body);
-//         const isUnsafe = response.data && response.data.matches;
-
-//         if (isUnsafe) {
-//             return false;
-//         }
-//     } catch (error) {
-//         console.error('Safe Browsing API error:', error.message);
-//         return false;
-//     }
-
-//     // ✅ Passed all checks
-//     return true;
-// }
-
-async function urlcheck(url) {
-  try {
-    const response = await axios.head(url);
-    console.log(`${url} is working. Status: ${response.status}`);
-    return true;
-  } catch (error) {
-    console.error(`${url} failed. ${error.response?.status || error.message}`);
-    return false;
-  }
+function urlcheck(url) {
+  if(url.includes(',' || url.includes(' '))) return false;
+  if(!url.includes('.')) return false;
+  return true
 }
 
 
 app.post('/api/shorten',short, async (req, res) => {
     const {userId} =getAuth(req);
-    console.log(userId);
     if(!userId) return res.status(401).json({message: 'please login' });
-    if(!req.body.originalUrl) return res.status(400).json({ message: 'Please enter a valid url' });
-    if(!checkprotocol(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
-    //if(!checkLink(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid url' });
-    urlcheck(req.body.originalUrl).then(async (r)=>{
-        console.log(r);
-        if(!r)  return res.status(400).json({ message: 'Please enter a valid url' });
-    console.log('short',req.shortUrl);
+    if(!req.body.originalUrl) return res.status(400).json({ message: 'Please enter a url' });
+    if(!checkprotocol(req.body.originalUrl)) return res.status(400).json({ message: 'Please enter a valid protocol' });
+    if(!urlcheck(req.body.originalUrl)) return res.status(400).json({message:"please enter a valid url"});
+
+
     const original = req.body.originalUrl;
     const short = `http://localhost:3000/${req.shortUrl}`;
     
     const query = 'SELECT short_url, long_url FROM userdata where long_url = ? and user_id = ?';
     const result = await db.execute(query, [original,userId]);
+    console.log('1',result[0]);
                 
     if(result[0].length>0){
                     return res.status(200).json({
@@ -154,11 +83,7 @@ app.post('/api/shorten',short, async (req, res) => {
                 res.status(400).send('error occured while inserting the url into db');
             }
             
-    }).catch((error)=>{
-        console.log(error);
-        return res.status(400).json({ message: 'Please enter a valid url' });
-    })
-});
+    });
 
 async function insert(short, original ,user_id) {
     try{
@@ -221,85 +146,3 @@ app.get('/:code',async (req, res) => {
     const [result] =await db.execute(query,[code,userId]);
     return res.redirect(result[0].long_url);
 })
-
-
-app.listen(3000, () => {
-    console.log('server is listening...')
-})
-
-
-// async function getdata(short, original) {
-    //     try {
-        //         let existingdata = {}
-        //         try {
-            
-        //             const data = await readFile('./urldata.json', 'utf8');
-        //             existingdata = JSON.parse(data);
-        //         } catch (err) {
-            //             existingdata = {}
-            //         }
-            
-            //         existingdata[short] = original;
-            
-            //         await writeFile('./urldata.json', JSON.stringify(existingdata));
-            //         console.log('54-');
-            
-            //     } catch (err) {
-                //         console.log(err);
-                //     }
-                //     console.log('getdata');
-                // }
-                
-                
-                
-                // function url(req, res, next) {
-                    //     console.log('url middleware');
-                    //     next();
-                    // }
-                    
-                    
-                    // for (const key of Object.keys(urlmap)) {
-                        //     if (urlmap[key] === original) {
-                            //         console.log('key '+key);
-                        //         return res.status(302).json({
-                            //             "shorturl": `http://localhost:3000/${key}`,
-                            //             "originalurl": original
-                            //         });
-            //     }
-            // }
-
-
-            // async function readfromurldata() {
-            // try {
-            //     const query = 'SELECT * FROM userdata';
-                
-            //     const [rows] = await db.execute(query);
-                
-            //     rows.forEach(row => {
-            //             urlmap[row.short_url] = row.long_url;
-            //         });
-            
-            //         console.log('dataa -',urlmap);
-            //         console.log('done');
-            //     } catch (err) {
-                //         console.log("No previous data. Starting fresh.");
-                //     }
-            // }
-            
-
-                // for (const key of Object.keys(urlmap)) {
-                    //     if (urlmap[key] === original) {
-                        //         return res.status(200).json({
-                            //             "shorturl": key,
-                            //             "originalurl": original
-                            //         });
-                            //     }
-                            // }
-                            
-                            // check((err,result)=>{
-                                //     if(err){
-                                    //         console.log(err);
-                                    //     }else{   
-                                        //         console.log(result);
-                                        //     }
-                                        // },original);

@@ -104,7 +104,7 @@ function Home() {
                     href={url.origin.originalurl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-black hover:text-blue-600 break-all underline"
+                    className="text-black hover:text-blue-600 break-all"
                   >
                     {url.origin.originalurl}
                   </a>
