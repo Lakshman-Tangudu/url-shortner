@@ -104,6 +104,9 @@ function Myurl() {
                                                 <p><strong>Original URL:</strong></p> <a href={item.original} target="_blank" rel="noopener noreferrer" className="text-gray-400">{item.original}</a>
                                             </div>
                                         </div>
+                                        <div className="ml-4">
+                                            <QRGenerator url={item.original} />
+                                        </div>
                                     </div>
                                     <div>
                                         <button onClick={() => handledelete(item)}><img src={trash} alt="delete" className="w-7 h-7"></img></button>

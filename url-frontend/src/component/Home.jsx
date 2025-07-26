@@ -111,6 +111,11 @@ function Home() {
                 </div>
               )}
             </div>
+            {url.isLoaded && url.origin?.originalurl && (
+              <div className="ml-4">
+                <QRGenerator url={url.origin.shorturl} />
+              </div>
+            )}
           </div>
         </div>
       </div>
