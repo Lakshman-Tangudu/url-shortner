@@ -9,7 +9,7 @@ function Signed_Navbar() {
     return (
         <SignedIn>
         <div>
-          <nav className="flex w-full bg-gray-400  justify-between h-12 items-center">
+          <nav className="flex w-full bg-gray-400  justify-between h-14 items-center">
             <div>
               <Link to="/" className="text-black"><HomeIcon className="ml-2"/></Link>
             </div>

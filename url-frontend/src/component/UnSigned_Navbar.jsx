@@ -8,7 +8,7 @@ import Homeicon from '../assets/homeicon.png';
 function UnSigned_Navbar() {
     return (
 <SignedOut>
-          <nav className="flex w-full bg-gray-400  justify-between h-12 items-center">
+          <nav className="flex w-full bg-gray-400  justify-between h-14 items-center">
             <div>
               <Link to="/" className="text-blue-800">
                 <img src={Homeicon} alt="Home" className="w-6 h-6 inline" />

@@ -1,4 +1,4 @@
-import { useState } from "react"; // Import the CSS file for styling
+import { useState } from "react"; 
 import { useAuth } from '@clerk/clerk-react';
 import { Copy } from "lucide-react";
 import QRGenerator from './QrCode';
@@ -51,7 +51,7 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <h1 className="text-center text-4xl font-bold text-gray-700 mb-12 shadow-sm">
+      <h1 className="text-center text-4xl font-bold text-gray-900 mb-20 pb-10 shadow-sm">
         URL Shortener
       </h1>
 

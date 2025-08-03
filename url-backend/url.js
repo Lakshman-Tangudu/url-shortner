@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { customAlphabet } = require('nanoid');
-const { clerkMiddleware, getAuth } = require('@clerk/express'); // ✅ Correct
+const { clerkMiddleware, getAuth } = require('@clerk/express');
 require('dotenv').config();
 const {connectToDb , getDb} =require('./db_connect');
 const app = express();
@@ -15,8 +15,8 @@ app.use(express.json());
 connectToDb()
     .then(() => {
         db = getDb();
-        app.listen(3000, () => {
-            console.log('Server is listening at http://localhost:3000');
+        app.listen(process.env.SERVER_PORT, () => {
+            console.log(`Server is listening at http://localhost:${process.env.SERVER_PORT}`);
         });
     })
     .catch((err) => {
@@ -64,7 +64,6 @@ app.post('/api/shorten',short, async (req, res) => {
     
     const query = 'SELECT short_url, long_url FROM userdata where long_url = ? and user_id = ?';
     const result = await db.execute(query, [original,userId]);
-    console.log('1',result[0]);
                 
     if(result[0].length>0){
                     return res.status(200).json({
@@ -87,7 +86,6 @@ app.post('/api/shorten',short, async (req, res) => {
 
 async function insert(short, original ,user_id) {
     try{
-        console.log('inserting',user_id);
         const query = 'INSERT INTO userdata (short_url, long_url , user_id) VALUES (?, ? ,?)';
         
         const [result] = await db.execute(query, [short, original,user_id]);
@@ -104,7 +102,6 @@ async function insert(short, original ,user_id) {
 app.put('/deletedata', async (req, res) => {
     const data = req.body.item.short;
     const {userId} =getAuth(req);
-    console.log('delereeee',userId);
     try {
         const result = await db.query('DELETE FROM userdata WHERE short_url = ? and user_id = ?', [data,userId]);
         res.json({ data: result, message: 'Data deleted successfully' });
@@ -118,7 +115,6 @@ app.put('/deletedata', async (req, res) => {
 
 app.get('/getdata',async (req,res)=>{
     const { userId} = getAuth(req);
-    console.log(userId);
     if(!userId) return res.status(401).json({ message: 'Unauthorized' });
     try {
         const query = 'SELECT * FROM userdata where user_id = ?';
@@ -137,7 +133,6 @@ app.get('/getdata',async (req,res)=>{
 
 app.get('/:code',async (req, res) => {
     const{userId} = getAuth(req);
-    console.log('redirect',userId);
     const code =`http://localhost:3000/${req.params.code}`;
     
     if (!code) return res.status(404).send('no url found');

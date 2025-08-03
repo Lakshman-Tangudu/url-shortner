@@ -4,28 +4,24 @@ import { useAuth } from '@clerk/clerk-react';
 import QRGenerator from './QrCode';
 import trash from '../assets/trash.png'; 
 function Myurl() {
-    const { getToken } = useAuth(); // Changed from token to getToken
+    const { getToken } = useAuth();
     const [urls, setUrls] = useState({
         data: null,
         isLoading: true
     });
-    console.log(urls.data)
 
     useEffect(() => {
-        console.log("useEffect triggered");
         getData();
     }, []);
 
     async function getData() {
         try {
-            const token = await getToken(); // Get fresh token
+            const token = await getToken();
             if (!token) {
                 console.error('No token available - user might be signed out');
                 setUrls({ data: [], isLoading: false });
                 return;
             }
-
-            console.log('Using token:', token); // Verify token exists
 
             const response = await fetch('http://localhost:3000/getdata', {
                 headers: {
@@ -33,14 +29,11 @@ function Myurl() {
                 }
             });
 
-            console.log('Response status:', response.status); // Log the response status
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const result = await response.json();
-            console.log("Full API response:", result); // Add this line
 
             if (!result.data) {
                 console.error('No data field in response');
@@ -52,16 +45,15 @@ function Myurl() {
                 original: item.long_url
             }));
 
-            console.log('Processed data:', urlArray);
             setUrls({ data: urlArray, isLoading: false });
         } catch (err) {
-            console.error('Error in getData:', err); // Add this line
+            console.error('Error in getData:', err); 
             setUrls({ data: [], isLoading: false });
         }
     }
 
     async function handledelete(item) {
-        const token = await getToken(); // Get fresh token
+        const token = await getToken(); 
         if (!token) {
             console.error('No token available - user might be signed out');
             setUrls({ data: [], isLoading: false });
@@ -77,7 +69,6 @@ function Myurl() {
             body: JSON.stringify({ item })
         })
         const data = await result.json();
-        console.log('data---------', data);
         getData();
     }
 
