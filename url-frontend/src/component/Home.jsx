@@ -32,7 +32,7 @@ function Home() {
       });
       const data = await response.json();
       console.log(response.status);
-      if (response.status !== 302 && response.status !== 200) {
+      if (response.status !== 201 && response.status !== 200) {
         throw new Error(data.message || 'Failed to shorten URL');
       }
       setUrl({
