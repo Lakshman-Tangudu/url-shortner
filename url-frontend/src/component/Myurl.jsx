@@ -22,8 +22,8 @@ function Myurl() {
                 setUrls({ data: [], isLoading: false });
                 return;
             }
-
-            const response = await fetch('http://localhost:3000/getdata', {
+                const backendUrl = import.meta.env.VITE_APP_API_URL;
+                const response = await fetch(`${backendUrl}/shorten`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -59,8 +59,8 @@ function Myurl() {
             setUrls({ data: [], isLoading: false });
             return;
         }
-
-        const result = await fetch('http://localhost:3000/deletedata', {
+        const backendUrl = import.meta.env.VITE_APP_API_URL;
+        const result = await fetch(`${backendUrl}/shorten`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
