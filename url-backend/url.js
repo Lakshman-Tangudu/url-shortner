@@ -8,13 +8,12 @@ const { connectToDb, getDb } = require('./db_connect');
 const app = express();
 let db;
 
-// ✅ CORS setup: use your actual frontend domain
 app.use(cors({
-  origin: 'https://url-shortner-engghy23k-tangudulakshman123-5201s-projects.vercel.app',
+  origin: 'https://url-shortner-bay-kappa.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
-app.options('*', cors()); // ✅ Handle preflight
+app.options('*', cors());
 
 app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: false }));
