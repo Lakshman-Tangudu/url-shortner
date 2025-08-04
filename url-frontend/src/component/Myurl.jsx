@@ -23,7 +23,7 @@ function Myurl() {
                 return;
             }
                 const backendUrl = import.meta.env.VITE_APP_API_URL;
-                const response = await fetch(`${backendUrl}/api/shorten`, {
+                const response = await fetch(`${backendUrl}api/shorten`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -60,7 +60,7 @@ function Myurl() {
             return;
         }
         const backendUrl = import.meta.env.VITE_APP_API_URL;
-        const result = await fetch(`${backendUrl}/api/shorten`, {
+        const result = await fetch(`${backendUrl}api/shorten`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
