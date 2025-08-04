@@ -26,14 +26,12 @@ function Home() {
     try {
       const token = await getToken();
       const backendUrl = import.meta.env.VITE_APP_API_URL;
-      console.log(backendUrl);
-      const response = await fetch(`${backendUrl}/shorten`, {
+      const response = await fetch(`${backendUrl}/api/shorten`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ originalUrl })
       });
       const data = await response.json();
-      console.log(response.status);
       if (response.status !== 201 && response.status !== 200) {
         throw new Error(data.message || 'Failed to shorten URL');
       }
