@@ -13,6 +13,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
+app.options('/api/shorten', cors()); 
 
 app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: false }));
