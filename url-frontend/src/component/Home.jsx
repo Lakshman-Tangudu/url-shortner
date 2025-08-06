@@ -26,7 +26,6 @@ function Home() {
     try {
       const token = await getToken();
       const backendUrl = import.meta.env.VITE_APP_API_URL;
-      console.log("Backend URL:", backendUrl);
       const response = await fetch(`${backendUrl}api/shorten`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },

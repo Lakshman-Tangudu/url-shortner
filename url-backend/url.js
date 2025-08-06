@@ -9,7 +9,7 @@ const app = express();
 let db;
 
 app.use(cors({
-  origin: 'https://url-shortner-bay-kappa.vercel.app',
+  origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
