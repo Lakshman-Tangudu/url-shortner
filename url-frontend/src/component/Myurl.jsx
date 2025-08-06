@@ -16,14 +16,18 @@ function Myurl() {
 
     async function getData() {
         try {
-            // const token = await getToken();
-            // if (!token) {
-            //     console.error('No token available - user might be signed out');
-            //     setUrls({ data: [], isLoading: false });
-            //     return;
-            //}
+            const token = await getToken();
+            if (!token) {
+                console.error('No token available - user might be signed out');
+                setUrls({ data: [], isLoading: false });
+                return;
+            }
                 const backendUrl = import.meta.env.VITE_APP_API_URL;
-                const response = await fetch(`${backendUrl}api/shorten`);
+                const response = await fetch(`${backendUrl}api/shorten`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,8 +63,8 @@ function Myurl() {
         const result = await fetch(`${backendUrl}api/shorten`, {
             method: 'PUT',
             headers: {
-                'content-type': 'application/json'
-                //Authorization: `Bearer ${token}`
+                'content-type': 'application/json',
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({ item })
         })
