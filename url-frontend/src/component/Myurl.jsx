@@ -64,7 +64,6 @@ function Myurl() {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
-                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({ item })
         })
