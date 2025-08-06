@@ -13,7 +13,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
-app.options('*', cors());
 
 app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: false }));
@@ -83,6 +82,7 @@ app.post('/api/shorten', short, async (req, res) => {
     res.status(400).send('Error occurred while inserting the url into db');
   }
 });
+
 
 async function insert(short, original, user_id) {
   try {
