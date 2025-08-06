@@ -8,12 +8,15 @@ const { connectToDb, getDb } = require('./db_connect');
 const app = express();
 let db;
 
+
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], 
   credentials: true
 }));
-app.options('/api/shorten', cors()); 
+
+app.options('*', cors());
 
 app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: false }));
