@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { customAlphabet } = require('nanoid');
 const { clerkMiddleware, getAuth } = require('@clerk/express');
 require('dotenv').config();
@@ -7,38 +8,58 @@ const { connectToDb, getDb } = require('./db_connect');
 const app = express();
 let db;
 
-// --- START: DYNAMIC CORS HEADERS MIDDLEWARE ---
-// This middleware dynamically sets the required CORS headers based on a whitelist.
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
-    'http://localhost:3000',                   // For local development
-    'http://localhost:5173',                   // For local Vite/React development
-  ];
+const allowedOrigins = [
+  'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
+  'http://localhost:3000',                   // For local development
+  'http://localhost:5173',                   // For local Vite/React development
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+// // --- START: DYNAMIC CORS HEADERS MIDDLEWARE ---
+// // This middleware dynamically sets the required CORS headers based on a whitelist.
+// app.use((req, res, next) => {
+//   const allowedOrigins = [
+//     'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
+//     'http://localhost:3000',                   // For local development
+//     'http://localhost:5173',                   // For local Vite/React development
+//   ];
   
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    // If the incoming origin is in our whitelist, allow it.
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//     // If the incoming origin is in our whitelist, allow it.
+//     res.setHeader('Access-Control-Allow-Origin', origin);
+//   }
   
-  // Allow specific HTTP methods.
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   // Allow specific HTTP methods.
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   
-  // Allow specific headers. It's crucial to include 'Authorization' for Clerk to work.
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   // Allow specific headers. It's crucial to include 'Authorization' for Clerk to work.
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
-  // Allow cookies and authorization headers to be sent from the frontend.
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+//   // Allow cookies and authorization headers to be sent from the frontend.
+//   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
-  // Handle the preflight 'OPTIONS' request.
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
+//   // Handle the preflight 'OPTIONS' request.
+//   if (req.method === 'OPTIONS') {
+//     return res.sendStatus(204);
+//   }
   
-  next();
-});
-// --- END: DYNAMIC CORS HEADERS MIDDLEWARE ---
+//   next();
+// });
+// // --- END: DYNAMIC CORS HEADERS MIDDLEWARE ---
 
 
 // Clerk middleware should come after CORS but before your routes.
