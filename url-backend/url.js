@@ -7,11 +7,20 @@ const { connectToDb, getDb } = require('./db_connect');
 const app = express();
 let db;
 
-// --- START: MANUAL CORS HEADERS MIDDLEWARE ---
-// This middleware manually sets the required CORS headers on every response.
+// --- START: DYNAMIC CORS HEADERS MIDDLEWARE ---
+// This middleware dynamically sets the required CORS headers based on a whitelist.
 app.use((req, res, next) => {
-  // Set the Access-Control-Allow-Origin header to allow requests from your specific frontend URL.
-  res.setHeader('Access-Control-Allow-Origin', 'https://url-shortner-bay-kappa.vercel.app');
+  const allowedOrigins = [
+    'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
+    'http://localhost:3000',                   // For local development
+    'http://localhost:5173',                   // For local Vite/React development
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    // If the incoming origin is in our whitelist, allow it.
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   
   // Allow specific HTTP methods.
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -22,16 +31,14 @@ app.use((req, res, next) => {
   // Allow cookies and authorization headers to be sent from the frontend.
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
-  // The browser sends an OPTIONS request first (a "preflight" request) to check these permissions.
-  // If the method is OPTIONS, we send back a 204 "No Content" response to tell the browser it's okay.
+  // Handle the preflight 'OPTIONS' request.
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
   }
   
-  // If it's not a preflight request, move on to the next middleware or route handler.
   next();
 });
-// --- END: MANUAL CORS HEADERS MIDDLEWARE ---
+// --- END: DYNAMIC CORS HEADERS MIDDLEWARE ---
 
 
 // Clerk middleware should come after CORS but before your routes.
