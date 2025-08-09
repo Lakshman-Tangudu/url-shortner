@@ -28,6 +28,8 @@ const corsOptions = {
   optionsSuccessStatus: 204
 };
 
+app.use(cors(corsOptions));
+
 // // --- START: DYNAMIC CORS HEADERS MIDDLEWARE ---
 // // This middleware dynamically sets the required CORS headers based on a whitelist.
 // app.use((req, res, next) => {
