@@ -9,14 +9,34 @@ const app = express();
 let db;
 
 
-app.use(cors({
-  origin: process.env.CORS_ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-  credentials: true
-}));
+const allowedOrigins = [
+  process.env.VITE_APP_API_URL, // Your production frontend URL
+  'http://localhost:3000',                   // Common local development URL
+  'http://localhost:5173',                   // Common Vite/React local dev URL
+];
 
-app.options('*', cors());
+// This is the core of the CORS configuration.
+// It checks if the request's origin is in our `allowedOrigins` list.
+const corsOptions = {
+  origin: (origin, callback) => {
+    // The `!origin` part allows for server-to-server requests or tools like Postman.
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // This allows cookies and authorization headers to be sent.
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Explicitly allow headers
+};
+
+// Handle preflight requests for all routes FIRST.
+// This is crucial for some hosting platforms to correctly handle the OPTIONS check.
+app.options('*', cors(corsOptions));
+
+// Then, use the CORS middleware for all other requests (GET, POST, etc.)
+app.use(cors(corsOptions));
 
 app.use(clerkMiddleware());
 app.use(express.urlencoded({ extended: false }));
