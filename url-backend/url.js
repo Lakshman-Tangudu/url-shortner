@@ -94,7 +94,7 @@ async function insert(short, original, user_id) {
 // --- API ROUTES ---
 
 // POST /api/shorten - Create a new shortened URL
-app.post('/api/shorten', short, async (req, res) => {
+app.post('/shorten', short, async (req, res) => {
   const { userId } = getAuth(req);
   if (!userId) return res.status(401).json({ message: 'Please login' });
   if (!req.body.originalUrl) return res.status(400).json({ message: 'Please enter a url' });

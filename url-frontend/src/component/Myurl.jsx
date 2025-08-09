@@ -22,7 +22,7 @@ function Myurl() {
                 setUrls({ data: [], isLoading: false });
                 return;
             }
-                const response = await fetch(`/getdata`, {
+                const response = await fetch(`/api/getdata`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -58,7 +58,7 @@ function Myurl() {
             setUrls({ data: [], isLoading: false });
             return;
         }
-        const result = await fetch(`/deletedata`, {
+        const result = await fetch(`/api/deletedata`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
