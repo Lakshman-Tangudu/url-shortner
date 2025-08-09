@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import { useState } from "react";
 import { useAuth } from '@clerk/clerk-react';
 import { Copy } from "lucide-react";
 import QRGenerator from './QrCode';
@@ -25,11 +25,15 @@ function Home() {
 
     try {
       const token = await getToken();
-      const response = await fetch(`url-shortner-backend-five-roan.vercel.app/api/shorten`, {
+      const response = await fetch('https://url-shortner-backend-five-roan.vercel.app/api/shorten', {
         method: 'POST',
-        headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ originalUrl })
       });
+
       const data = await response.json();
       if (response.status !== 201 && response.status !== 200) {
         throw new Error(data.message || 'Failed to shorten URL');
