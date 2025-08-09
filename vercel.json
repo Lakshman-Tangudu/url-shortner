@@ -4,25 +4,22 @@
     {
       "src": "url-backend/url.js",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/shorten",
-      "methods": [
-        "OPTIONS"
-      ],
-      "headers": {
-        "Access-Control-Allow-Origin": "https://url-shortner-bay-kappa.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Credentials": "true"
-      },
-      "status": 204
     },
     {
-      "src": "/api/(.*)",
-      "dest": "url-backend/url.js"
+      "src": "url-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/url-backend/url.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/url-frontend/dist/$1"
     }
   ]
 }
+

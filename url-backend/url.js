@@ -9,7 +9,7 @@ const app = express();
 let db;
 
 const allowedOrigins = [
-  'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
+  process.env.FRONTEND_URL, // Your production frontend
   'http://localhost:3000',                   // For local development
   'http://localhost:5173',                   // For local Vite/React development
 ];
@@ -30,40 +30,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// // --- START: DYNAMIC CORS HEADERS MIDDLEWARE ---
-// // This middleware dynamically sets the required CORS headers based on a whitelist.
-// app.use((req, res, next) => {
-//   const allowedOrigins = [
-//     'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
-//     'http://localhost:3000',                   // For local development
-//     'http://localhost:5173',                   // For local Vite/React development
-//   ];
-  
-//   const origin = req.headers.origin;
-//   if (allowedOrigins.includes(origin)) {
-//     // If the incoming origin is in our whitelist, allow it.
-//     res.setHeader('Access-Control-Allow-Origin', origin);
-//   }
-  
-//   // Allow specific HTTP methods.
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  
-//   // Allow specific headers. It's crucial to include 'Authorization' for Clerk to work.
-//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-//   // Allow cookies and authorization headers to be sent from the frontend.
-//   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-//   // Handle the preflight 'OPTIONS' request.
-//   if (req.method === 'OPTIONS') {
-//     return res.sendStatus(204);
-//   }
-  
-//   next();
-// });
-// // --- END: DYNAMIC CORS HEADERS MIDDLEWARE ---
-
-
 // Clerk middleware should come after CORS but before your routes.
 app.use(clerkMiddleware());
 
@@ -74,7 +40,7 @@ app.use(express.json());
 
 // --- Database Connection and Server Start ---
 (async () => {
-  try {
+ try {
     await connectToDb();
     db = getDb();
     app.listen(process.env.SERVER_PORT || 3001, () => {
