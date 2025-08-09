@@ -25,7 +25,6 @@ function Home() {
 
     try {
       const token = await getToken();
-      console.log('Token:', token);
       const response = await fetch('https://url-shortner-backend-five-roan.vercel.app/api/shorten', {
         method: 'POST',
         headers: {
