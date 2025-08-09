@@ -1,64 +1,49 @@
 import { useState } from "react";
+import { useAuth } from '@clerk/clerk-react';
 import { Copy } from "lucide-react";
-import QRGenerator from './QrCode'; // Assuming you have this component
-
+import QRGenerator from './QrCode';
 function Home() {
-  // State to manage the URL data and loading status
+  const { getToken } = useAuth();
   const [url, setUrl] = useState({
     origin: null,
     isLoaded: false,
-    optimistic: null, // To show loading/error messages
+    optimistic: null
   });
 
-  /**
-   * Handles the form submission to shorten a URL.
-   * @param {React.FormEvent<HTMLFormElement>} e The form event.
-   */
   const formsubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const originalUrl = formData.get("originalUrl");
 
-    if (!originalUrl) {
-      // Use optimistic state to show user feedback instead of alert()
-      setUrl(prev => ({ ...prev, optimistic: 'Please enter a valid URL.' }));
-      return;
-    }
+    if (!originalUrl) { return alert('enter a valid url') }
 
-    // Set a loading message
     setUrl(prev => ({
       ...prev,
-      optimistic: "Shortening...",
+      optimistic: "waiting...",
       isLoaded: false
     }));
 
     try {
-      // Fetch request to the public backend API
+      const token = await getToken();
       const response = await fetch('https://url-shortner-backend-five-roan.vercel.app/api/shorten', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization' header is removed as it's no longer needed
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ originalUrl })
       });
 
       const data = await response.json();
-
-      // Check for non-successful status codes
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to shorten URL. Please try again.');
+      if (response.status !== 201 && response.status !== 200) {
+        throw new Error(data.message || 'Failed to shorten URL');
       }
-
-      // Update state with the successful response
       setUrl({
         origin: data,
         isLoaded: true,
         optimistic: null
       });
-
     } catch (err) {
-      // Update state with the error message
       setUrl(prev => ({
         ...prev,
         optimistic: err.message,
@@ -78,7 +63,7 @@ function Home() {
           <input
             type="text"
             name="originalUrl"
-            placeholder="Enter the URL to shorten..."
+            placeholder="Enter the URL..."
             className="flex-1 border border-gray-300 rounded-l-md px-4 h-12 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"
           />
           <button
@@ -89,44 +74,56 @@ function Home() {
           </button>
         </form>
 
-        <div className="text-center text-gray-700 space-y-4 pt-4">
-          {/* Display loading or error messages */}
-          {url.optimistic && <div className="text-red-500">{url.optimistic}</div>}
-          
-          {/* Display the shortened URL result */}
-          {url.isLoaded && url.origin?.shorturl && (
-            <div className="flex flex-col md:flex-row justify-center items-center gap-4 p-4 bg-gray-100 rounded-md">
-              <div className="flex-grow text-left">
-                {/* Short URL */}
-                <div className="flex items-center gap-2">
-                  <strong className="whitespace-nowrap">Short URL:</strong>
+        <div className="text-center text-gray-700 space-y-2">
+          {url.optimistic && <div>{url.optimistic}</div>}
+          <div className="flex justify-center">
+            <div>
+              {url.isLoaded && url.origin?.shorturl && (
+                <div className="flex justify-center">
+                  <div className="flex max-[500px]:flex-col items-start">
+                    <div>
+                      <strong>Short URL :</strong>
+                    </div>
+                    <div className="flex">
+                      <a
+                        href={url.origin.shorturl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black hover:text-blue-600 underline break-all"
+                      >
+                        {url.origin.shorturl}
+                      </a>
+                      <button onClick={() => navigator.clipboard.writeText(url.origin.shorturl)} className="ml-4 bg-white text-black rounded-lg items-baseline">
+                        <Copy className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {url.isLoaded && url.origin?.originalurl && (
+                <div>
+                  <strong>Original URL:</strong>{" "}
                   <a
-                    href={url.origin.shorturl}
+                    href={url.origin.originalurl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-black hover:text-blue-600 underline break-all"
+                    className="text-black hover:text-blue-600 break-all"
                   >
-                    {url.origin.shorturl}
+                    {url.origin.originalurl}
                   </a>
-                  <button onClick={() => navigator.clipboard.writeText(url.origin.shorturl)} className="p-1 text-gray-500 hover:text-black">
-                    <Copy className="w-5 h-5" />
-                  </button>
                 </div>
-                {/* Original URL */}
-                <div className="mt-2 text-sm text-gray-500 break-all">
-                  <strong>Original:</strong> {url.origin.originalurl}
-                </div>
-              </div>
-              
-              {/* QR Code */}
-              <div className="flex-shrink-0">
+              )}
+            </div>
+            {url.isLoaded && url.origin?.originalurl && (
+              <div className="ml-4">
                 <QRGenerator url={url.origin.shorturl} />
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
+
   );
 }
 
