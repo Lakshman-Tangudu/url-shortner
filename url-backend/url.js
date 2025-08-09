@@ -10,7 +10,7 @@ let db;
 
 
 const allowedOrigins = [
-  process.env.VITE_APP_API_URL, // Your production frontend URL
+  process.env.CORS_ORIGIN, // Your production frontend URL
   'http://localhost:3000',                   // Common local development URL
   'http://localhost:5173',                   // Common Vite/React local dev URL
 ];
