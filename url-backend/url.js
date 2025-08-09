@@ -10,9 +10,9 @@ let db;
 
 
 const allowedOrigins = [
-  process.env.CORS_ORIGIN, // Your production frontend URL
-  'http://localhost:3000',                   // Common local development URL
-  'http://localhost:5173',                   // Common Vite/React local dev URL
+  'https://url-shortner-bay-kappa.vercel.app', // Your deployed frontend
+  'http://localhost:3000',                     // Local development URL
+  'http://localhost:5173',                     // Vite/React dev URL
 ];
 
 // This is the core of the CORS configuration.
