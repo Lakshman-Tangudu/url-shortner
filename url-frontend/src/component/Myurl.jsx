@@ -22,7 +22,7 @@ function Myurl() {
                 setUrls({ data: [], isLoading: false });
                 return;
             }
-                const response = await fetch(`/api/getdata`, {
+                const response = await fetch(`${process.env.VITE_APP_API_URL}/api/getdata`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -58,7 +58,8 @@ function Myurl() {
             setUrls({ data: [], isLoading: false });
             return;
         }
-        const result = await fetch(`/api/deletedata`, {
+
+        const result = await fetch(`${process.env.VITE_APP_API_URL}/api/deletedata`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',

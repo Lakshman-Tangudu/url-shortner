@@ -25,7 +25,7 @@ function Home() {
 
     try {
       const token = await getToken();
-      const response = await fetch(`/api/shorten`, {
+      const response = await fetch(`${process.env.VITE_APP_API_URL}/api/shorten`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
