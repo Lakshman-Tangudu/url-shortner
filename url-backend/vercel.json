@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "url-backend/url.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "url-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/url-backend/url.js"
+    }
+  ]
+}
