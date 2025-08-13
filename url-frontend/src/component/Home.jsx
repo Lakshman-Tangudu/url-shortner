@@ -25,7 +25,8 @@ function Home() {
 
     try {
       const token = await getToken();
-      const response = await fetch(`/api/shorten`, {
+      const backend = process.env.BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${backend}/api/shorten`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
