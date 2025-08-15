@@ -7,29 +7,12 @@ const { connectToDb, getDb } = require('./db_connect');
 
 const app = express();
 let db;
-
-const allowedOrigins = [
-   process.env.FRONTEND_URL, // Your production frontend
-  'http://localhost:3000',                   // For local development
-  'http://localhost:5173',                   // For local Vite/React development
-];
-
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 204
+  origin: 'https://url-shortner-frontend-1pua.onrender.com',
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
 app.use(cors(corsOptions));
-
 // Clerk middleware should come after CORS but before your routes.
 app.use(clerkMiddleware());
 
