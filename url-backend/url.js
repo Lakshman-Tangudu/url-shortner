@@ -9,7 +9,7 @@ const app = express();
 let db;
 
 const allowedOrigins = [
-  'https://url-shortner-bay-kappa.vercel.app/', // Your production frontend
+  'https://url-shortner-bay-kappa.vercel.app', // Your production frontend
   'http://localhost:3000',                   // For local development
   'http://localhost:5173',                   // For local Vite/React development
 ];
