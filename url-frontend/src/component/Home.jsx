@@ -25,7 +25,7 @@ function Home() {
 
     try {
       const token = await getToken();
-      const backend = process.env.VITE_APP_API_URL;
+      const backend = import.meta.env.VITE_APP_API_URL || 'http://localhost:3000';
       const response = await fetch(`${backend}/api/shorten`, {
         method: 'POST',
         headers: {
@@ -50,6 +50,7 @@ function Home() {
         optimistic: err.message,
         isLoaded: false
       }));
+      console.error('Error in formsubmit:', err.message);
     }
   };
 

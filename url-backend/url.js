@@ -8,7 +8,7 @@ const { connectToDb, getDb } = require('./db_connect');
 const app = express();
 let db;
 const corsOptions = {
-  origin: 'https://url-shortner-frontend-1pua.onrender.com',
+  origin: process.env.FRONTEND_UR || 'http://localhost:5173',
   optionsSuccessStatus: 200 // For legacy browser support
 };
 
