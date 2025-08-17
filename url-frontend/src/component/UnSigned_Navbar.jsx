@@ -11,7 +11,7 @@ function UnSigned_Navbar() {
           <nav className="flex w-full bg-gray-400  justify-between h-14 items-center">
             <div>
               <Link to="/" className="text-blue-800">
-                <HomeIcon className="w-6 h-6 inline" />
+                <HomeIcon className="w-6 h-6 ml-2 inline" />
               </Link>
             </div>
             <div className="mr-2 flex justify-between items-center gap-3">
@@ -19,7 +19,7 @@ function UnSigned_Navbar() {
                 <Link to="/myurl" className="text-blue-800">My Urls</Link>
               </div>
               <div>
-                <SignInButton mode="modal" />
+                <SignInButton mode="modal" className="text-blue-800"/>
               </div>
             </div>
           </nav>
